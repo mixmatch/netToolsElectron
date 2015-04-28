@@ -1,0 +1,47 @@
+{
+  "name": "netTools",
+  "productName": "App",
+  "version": "0.0.1",
+  "description": "Net Tools",
+  "license": "Unlicense",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mixmatch/netToolsElectron"
+  },
+  "bugs": {
+    "url": "https://github.com/mixmatch/netToolsElectron/issues"
+  },
+  "author": {
+    "name": "Daniel Petty",
+    "email": "mixmatch@gmail.com",
+    "url": "https://danielpetty.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . $npm_package_productName --prune --ignore=node_modules/electron-prebuilt --ignore=node_modules/electron-packager --ignore=.git"
+  },
+  "files": [
+    "index.js",
+    "index.html",
+    "index.css"
+  ],
+  "keywords": [
+    "electron-app"
+  ],
+  "dependencies": {
+    "express": "*",
+    "request": "*",
+    "cheerio": "*",
+    "telnet-client": "*",
+    "sequest": "*",
+    "evilscan": "*"
+  },
+  "devDependencies": {
+    "electron-packager": "^3.1.0",
+    "electron-prebuilt": "^0.25.1"
+  }
+}
