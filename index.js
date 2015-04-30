@@ -2,12 +2,18 @@
 const app = require('app');
 const BrowserWindow = require('browser-window');
 var express = require('express');
-var expressApp = express();
 var request = require('request');
 var cheerio = require('cheerio');
-expressApp.get('/', function (req, res) {
-  res.send('Hello World!');
-});
+//
+var oneMinute = 60000;
+var oneHour = 360000;
+var oneDay = 86400000;
+//
+var expressApp = express();
+expressApp.use(express.static(__dirname + '/public', { maxAge: oneHour }));
+// expressApp.get('/', function (req, res) {
+//   res.send('Hello World!');
+// });
 var server = expressApp.listen(3000, function () {
 
   var host = server.address().address;
@@ -37,7 +43,7 @@ app.on('ready', function () {
 	});
 
 	// mainWindow.loadUrl(`file://${__dirname}/index.html`);
-	mainWindow.loadUrl(`http://localhost:3000/`);
+	mainWindow.loadUrl('http://localhost:3000/');
 
 	mainWindow.on('closed', function () {
 		// deref the window
