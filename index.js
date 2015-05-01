@@ -1,7 +1,10 @@
 'use strict';
 const app = require('app');
 const BrowserWindow = require('browser-window');
+var bodyParser = require('body-parser')
+var compression = require('compression');
 var express = require('express');
+var spawn = require('child_process').spawn;
 var request = require('request');
 var cheerio = require('cheerio');
 //
@@ -10,10 +13,44 @@ var oneHour = 360000;
 var oneDay = 86400000;
 //
 var expressApp = express();
+expressApp.use(bodyParser.urlencoded({ extended: true }));
+expressApp.use(compression());
 expressApp.use(express.static(__dirname + '/public', { maxAge: oneHour }));
-// expressApp.get('/', function (req, res) {
-//   res.send('Hello World!');
-// });
+expressApp.post('/', function (req, res) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Type', 'text/plain; charset=UTF-8');
+  res.write('you posted:\n');
+  var ip = req.body.ip;
+  if (ip){
+    res.write('IP: ' + ip + '\n');
+    if (req.body.ping){
+      var ping = spawn('C:/windows/system32/ping.exe', [ip]);
+      ping.stdout.pipe(res);
+      // var child = cp.spawn('C:/windows/system32/ping.exe', ['-n', '1', '-w', '5000', ip]);
+      // child.on('error', function (e) {
+      //   var err = new Error('ping.probe: there was an error while executing the ping program. check the path or permissions...');
+      //   //cb(null, err);
+      // });
+      // child.stdout.on('data', function(data) {
+      //   console.log('stdout: ' + data);
+      //   res.write(String(data) + '<br />\n');
+      // });
+      // child.stderr.on('data', function(data) {
+      //   console.log('stdout: ' + data);
+      //   res.write(String(data) + '<br />\n');
+      // });
+      // child.on('close', function(code) {
+      //   console.log('closing code: ' + code);
+      //   // res.write(String(data) + '<br />\n');
+      // });
+    }
+    if (req.body.portscan){
+      res.write('Port Scan: ' + req.body.portscan + '\n');
+    }
+  }
+  // res.end(JSON.stringify(req.body, null, 2));
+  
+});
 var server = expressApp.listen(3000, function () {
 
   var host = server.address().address;

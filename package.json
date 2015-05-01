@@ -33,6 +33,8 @@
     "electron-app"
   ],
   "dependencies": {
+    "body-parser": "*",
+    "compression": "*",
     "express": "*",
     "request": "*",
     "cheerio": "*",
