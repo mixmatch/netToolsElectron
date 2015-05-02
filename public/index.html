@@ -1,20 +1,55 @@
 <!doctype html>
-<html>
+<html ng-app="netToolsApp">
 <head>
 <meta charset="utf-8">
 <title>Tool</title>
+<script src="angular/angular.min.js"></script>
+<link href="index.css" rel="stylesheet">
 </head>
 
 <body>
-<form id="form1" name="form1" method="post">
-  <p>
-    <input type="text" name="ip" id="ip" placeholder="IP Address">
-    <input type="submit" name="submit" id="submit" value="Go!">
+<div ng-controller="netController">
+  <form>
+    <!-- IP Regex -->
+    <!-- http://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/ -->
+    <input type="text" name="ip" id="ip" placeholder="Enter valid IP" ng-model="netTools.ip" ng-pattern="/(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/">
+    <button ng-click="netTools.doSubmit(item, $event)">Go!</button>
     <br>
-    <input type="checkbox" name="ping" id="ping" value="true">
+    <input type="checkbox" name="ping" id="ping" ng-model="netTools.ping"
+                        ng-true-value="true" ng-false-value="false" >
     <label for="ping">Ping </label><br>
-    <input type="checkbox" name="portscan" id="portscan" value="true">
-    <label for="checkbox2">Port Scan </label><br>
-</form>
+    <input type="checkbox" name="tracert" id="tracert" ng-model="netTools.tracert"
+                        ng-true-value="true" ng-false-value="false" >
+    <label for="tracert">Tracert </label><br>
+    <input type="checkbox" name="portscan" id="portscan" ng-model="netTools.portscan"
+                        ng-true-value="true" ng-false-value="false" >
+    <label for="portscan">Port Scan </label><br>
+    <textarea name="result" id="result" ng-model="netTools.result"></textarea>
+  </form>
+</div>
+<script>
+  angular.module("netToolsApp", [])
+    .controller("netController", function($scope, $http) {
+      $scope.netTools = {};
+      $scope.netTools.doSubmit = function(item, event) {
+         console.log("--> Submitting form");
+         var dataObject = {
+           ip : $scope.netTools.ip,
+           ping : $scope.netTools.ping,
+           tracert : $scope.netTools.tracert,
+           portscan : $scope.netTools.portscan,
+         };
+  
+         var responsePromise = $http.post("http://localhost:3000/", dataObject, {});
+         responsePromise.success(function(dataFromServer, status, headers, config) {
+            console.log(dataFromServer);
+            $scope.netTools.result = dataFromServer;
+         });
+          responsePromise.error(function(data, status, headers, config) {
+            alert("Submitting form failed!");
+         });
+       }
+    });
+</script>
 </body>
 </html>
