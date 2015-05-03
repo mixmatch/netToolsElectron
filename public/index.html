@@ -1,36 +1,76 @@
-<!doctype html>
-<html ng-app="netToolsApp">
+<!DOCTYPE html>
+<html lang="en" ng-app="netToolsApp">
 <head>
 <meta charset="utf-8">
 <title>Tool</title>
-<script src="angular/angular.min.js"></script>
+<link href="bootstrap-css-only/css/bootstrap.min.css" rel="stylesheet">
 <link href="index.css" rel="stylesheet">
+<script src="angular/angular.min.js"></script>
+<script src="angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 </head>
 
 <body>
-<div ng-controller="netController">
-  <form>
+<div ng-controller="netController" class="container-fluid">
+  <form class="form-inline">
     <!-- IP Regex -->
     <!-- http://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/ -->
-    <input type="text" name="ip" id="ip" placeholder="Enter valid IP" ng-model="netTools.ip" ng-pattern="/(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/">
-    <button ng-click="netTools.doSubmit(item, $event)">Go!</button>
-    <br>
-    <input type="checkbox" name="ping" id="ping" ng-model="netTools.ping"
-                        ng-true-value="true" ng-false-value="false" >
-    <label for="ping">Ping </label><br>
-    <input type="checkbox" name="tracert" id="tracert" ng-model="netTools.tracert"
-                        ng-true-value="true" ng-false-value="false" >
-    <label for="tracert">Tracert </label><br>
-    <input type="checkbox" name="portscan" id="portscan" ng-model="netTools.portscan"
-                        ng-true-value="true" ng-false-value="false" >
-    <label for="portscan">Port Scan </label><br>
-    <textarea name="result" id="result" ng-model="netTools.result"></textarea>
+    <div class="form-group">
+      <div class="input-group">
+        <input type="text" name="ip" id="ip" placeholder="Enter valid IP" ng-model="netTools.ip" ng-pattern="/(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/" class="form-control input-sm">
+        <span class="input-group-btn">
+          <button ng-click="netTools.doSubmit(item, $event)" class="btn btn-primary btn-sm">Go!</button>
+        </span>
+      </div><br />
+      <input type="checkbox" name="ping" id="ping" ng-model="netTools.ping"
+                          ng-true-value="true" ng-false-value="false">
+      <label for="ping">Ping </label><br>
+      <input type="checkbox" name="tracert" id="tracert" ng-model="netTools.tracert"
+                          ng-true-value="true" ng-false-value="false">
+      <label for="tracert">Tracert </label><br>
+      <input type="checkbox" name="portscan" id="portscan" ng-model="netTools.portscan"
+                          ng-true-value="true" ng-false-value="false">
+      <label for="portscan">Port Scan </label><br>
+    </div>
   </form>
+  <tabset>
+    <tab heading="Ping"><textarea class="result" name="pingResult" id="pingResult" ng-model="netTools.pingResult" readonly="readonly"></textarea></tab>
+    <tab heading="Traceroute"><textarea class="result" name="tracertResult" id="tracertResult" ng-model="netTools.tracertResult" readonly="readonly"></textarea></tab>
+    <tab heading="Port Scan"><textarea class="result" name="portScanResult" id="portScanResult" ng-model="netTools.portScanResult" readonly="readonly"></textarea></tab>
+  </tabset>
 </div>
 <script>
-  angular.module("netToolsApp", [])
+  angular.module("netToolsApp", ['ui.bootstrap'])
     .controller("netController", function($scope, $http) {
       $scope.netTools = {};
+      $scope.netTools.chunkTimeout = null;
+      $scope.netTools.getNextChunk = function(requestID) {
+        var responsePromise = $http.get("/request?requestID=" + requestID);
+        responsePromise.success($scope.netTools.processResponse);
+      }
+      $scope.netTools.processResponse = function(dataFromServer, status, headers, config) {
+        // console.log(dataFromServer);
+        // console.log(JSON.stringify(dataFromServer, null, 2));
+        if (dataFromServer.id != "false" && dataFromServer.id != "undefined"){
+          for (var tool in dataFromServer.result) {
+            // console.log(JSON.stringify(dataFromServer.result[tool], null, 2));
+           $scope.netTools[tool + "Result"] = dataFromServer.result[tool].output;
+           var textarea = document.getElementById(tool + "Result");
+           if (textarea){
+             setTimeout(function() {
+               textarea.scrollTop = textarea.scrollHeight;
+             }, 1);
+           }
+           if (dataFromServer.result[tool].complete != true) {
+             console.log(dataFromServer.result[tool].complete);
+             if ($scope.netTools.chunkTimeout != null) {
+               clearTimeout($scope.netTools.chunkTimeout);
+               $scope.netTools.chunkTimeout = null;
+             }
+             $scope.netTools.chunkTimeout = setTimeout($scope.netTools.getNextChunk, 100, dataFromServer.id);
+           }
+          }
+        }
+      }
       $scope.netTools.doSubmit = function(item, event) {
          console.log("--> Submitting form");
          var dataObject = {
@@ -40,11 +80,8 @@
            portscan : $scope.netTools.portscan,
          };
   
-         var responsePromise = $http.post("http://localhost:3000/", dataObject, {});
-         responsePromise.success(function(dataFromServer, status, headers, config) {
-            console.log(dataFromServer);
-            $scope.netTools.result = dataFromServer;
-         });
+         var responsePromise = $http.post("/", dataObject, {});
+         responsePromise.success($scope.netTools.processResponse);
           responsePromise.error(function(data, status, headers, config) {
             alert("Submitting form failed!");
          });
