@@ -9,6 +9,7 @@ var cp = require('child_process');
 var spawn = cp.spawn;
 var exec = cp.exec;
 var os = require('os');
+var evilscan = require('evilscan');
 var request = require('request');
 var cheerio = require('cheerio');
 //
@@ -69,6 +70,7 @@ expressApp.use(compression());
 expressApp.use(express.static(__dirname + '/public', { maxAge: oneSecond }));
 expressApp.use(express.static(__dirname + '/bower_components', { maxAge: oneSecond }));
 expressApp.post('/', function (req, res) {
+  console.log(req.body.options);
   var requestID = Date.now();
   requests[requestID] = {id: requestID, result: {}};
   var currentRequest = requests[requestID];
@@ -109,7 +111,7 @@ expressApp.post('/', function (req, res) {
     //init processes
     if (req.body.ping) {
       // res.write('Ping:\n');
-      var ping = spawn(commands.ping.bin, [commands.ping.count, defaults.pingCoung, commands.ping.size, defaults.pingSize, commands.ping.timeout, defaults.pingTimeout, ip]);
+      var ping = spawn(commands.ping.bin, [commands.ping.count, req.body.options.ping.count, commands.ping.size, req.body.options.ping.size, commands.ping.timeout, req.body.options.ping.timeout, ip]);
       ping.stdout.on('data', function(data) {
         // console.log('stdout: ' + data);
         currentRequest.result.ping.output += data.toString();
@@ -141,6 +143,32 @@ expressApp.post('/', function (req, res) {
         currentRequest.result.tracert.complete = true;
       });
     }
+    if (req.body.portscan) {
+      var scanOptions = {
+          target:ip,
+          port:'21-23,25,37,42,53,69,70,79,80,109,110,115,118,119,137,139,143,150,156,161,179,194,443,1900',
+          status:'O', // Timeout, Refused, Open, Unreachable
+          banner:true
+      };
+      var scanner = new evilscan(scanOptions);
+      scanner.on('result',function(data) {
+        // fired when item is matching options
+        console.log(data);
+        currentRequest.result.portscan.output += JSON.stringify(data);
+        // currentRequest.result.portscan.output += JSON.stringify(data, null, ' ');
+      });
+      scanner.on('error',function(err) {
+        console.log(err);
+        currentRequest.result.portscan.error += err.toString();
+      });
+      scanner.on('done',function() {
+        // finished !
+        console.log("Portscan Done");
+        currentRequest.result.portscan.closeCode = 0;
+        currentRequest.result.portscan.complete = true;
+      });
+      scanner.run();
+    }
   } else {
     res.end(JSON.stringify({id: false}, null, 2));
   }
@@ -171,7 +199,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 	mainWindow = new BrowserWindow({
 		width: 800,
-		height: 600,
+		height: 800,
 		resizable: true
 	});
 

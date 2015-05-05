@@ -1,6 +1,6 @@
 body {
-	background-color: #002d62;
-	color: #FFFFFF;
+	background: #002d62;
+	height: auto;
 }
 
 header {
@@ -21,11 +21,44 @@ header h1 {
 	margin: 0;
 	padding: 0;
 }
-input[type="text"], textarea, button {
+textarea {
 	color: #FFFFFF;
 	background-color: #000000;
+	border: none;
 }
 .result {
-	width: 100%;
+	width: 90%;
 	height: 400px;
 }
+.netController section {
+  background: #f7f7f7;
+  border-radius: 3px;
+  text-align: center;
+  margin: 1em;
+  position: relative !important;
+  padding-bottom: 0px; }
+.netController md-content {
+  background-color: transparent !important; }
+.netController md-tabs {
+  width: 99%; }
+.netController md-tab {
+  padding:0.2em 0.8em; }
+.netController section .md-header {
+	margin: 0.1em;
+	height: 40px;
+  width: auto; }
+.netController section .md-tabs-content {
+  width: auto; }
+.netController section .md-button {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  margin-left: 8px;
+  margin-right: 8px; }
+.netController .label {
+  position: absolute;
+  bottom: 5px;
+  left: 7px;
+  font-size: 14px;
+  opacity: 0.54; }
+	.netController input[type="number"] {
+  text-align: center; }
