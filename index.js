@@ -70,7 +70,7 @@ expressApp.use(compression());
 expressApp.use(express.static(__dirname + '/public', { maxAge: oneSecond }));
 expressApp.use(express.static(__dirname + '/bower_components', { maxAge: oneSecond }));
 expressApp.post('/', function (req, res) {
-  console.log(req.body.options);
+  // console.log(req.body.options);
   var requestID = Date.now();
   requests[requestID] = {id: requestID, result: {}};
   var currentRequest = requests[requestID];
@@ -130,7 +130,6 @@ expressApp.post('/', function (req, res) {
       // res.write('Ping:\n');
       var tracert = spawn(commands.tracert.bin, [ip]);
       tracert.stdout.on('data', function(data) {
-        // console.log('stdout: ' + data);
         currentRequest.result.tracert.output += data.toString();
       });
       tracert.stderr.on('data', function(data) {
@@ -144,26 +143,49 @@ expressApp.post('/', function (req, res) {
       });
     }
     if (req.body.portscan) {
+      var portStatus = "";
+      if (req.body.options.portscan.T){
+        portStatus += "T";
+      }
+      if (req.body.options.portscan.R){
+        portStatus += "R";
+      }
+      if (req.body.options.portscan.O){
+        portStatus += "O";
+      }
+      if (req.body.options.portscan.U){
+        portStatus += "U";
+      }
       var scanOptions = {
           target:ip,
-          port:'21-23,25,37,42,53,69,70,79,80,109,110,115,118,119,137,139,143,150,156,161,179,194,443,1900',
-          status:'O', // Timeout, Refused, Open, Unreachable
-          banner:true
+          port: req.body.options.portscan.port,
+          status: portStatus, // Timeout, Refused, Open, Unreachable
+          banner: req.body.options.portscan.banner
       };
       var scanner = new evilscan(scanOptions);
       scanner.on('result',function(data) {
         // fired when item is matching options
-        console.log(data);
-        currentRequest.result.portscan.output += JSON.stringify(data);
+        // console.log(data);
+        var scannerOutput = "";
+        // for (var port in data) {
+        //   console.log(JSON.stringify(data, null, ' '));
+        //   console.log(JSON.stringify(data[port], null, ' '));
+        //   scannerOutput += "Port: " + data[port].port + " | Status: " + data[port].status + " | Banner: " + data[port].banner + "\n"
+        // }
+        scannerOutput += "Port: " + data.port + " | Status: " + data.status;
+        if (data.banner) {
+          scannerOutput += " | Banner: \n" + data.banner;
+        }
+        currentRequest.result.portscan.output += scannerOutput + "\n";
         // currentRequest.result.portscan.output += JSON.stringify(data, null, ' ');
       });
       scanner.on('error',function(err) {
-        console.log(err);
+        // console.log(err);
         currentRequest.result.portscan.error += err.toString();
       });
       scanner.on('done',function() {
         // finished !
-        console.log("Portscan Done");
+        // console.log("Portscan Done");
         currentRequest.result.portscan.closeCode = 0;
         currentRequest.result.portscan.complete = true;
       });

@@ -30,6 +30,9 @@ textarea {
 	width: 90%;
 	height: 400px;
 }
+/*transform: scale(0.5,0.5);*/
+.netController {
+}
 .netController section {
   background: #f7f7f7;
   border-radius: 3px;
@@ -39,10 +42,12 @@ textarea {
   padding-bottom: 0px; }
 .netController md-content {
   background-color: transparent !important; }
+.netController md-slider {
+	transform: scale(0.8,0.8); }
 .netController md-tabs {
   width: 99%; }
 .netController md-tab {
-  padding:0.2em 0.8em; }
+  padding:0.1em 0.4em; }
 .netController section .md-header {
 	margin: 0.1em;
 	height: 40px;
@@ -50,14 +55,14 @@ textarea {
 .netController section .md-tabs-content {
   width: auto; }
 .netController section .md-button {
-  margin-top: 8px;
-  margin-bottom: 8px;
-  margin-left: 8px;
-  margin-right: 8px; }
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+  margin-left: 0.1em;
+  margin-right: 0.1em; }
 .netController .label {
   position: absolute;
-  bottom: 5px;
-  left: 7px;
+  bottom: 0.1em;
+  left: 0.1em;
   font-size: 14px;
   opacity: 0.54; }
 	.netController input[type="number"] {

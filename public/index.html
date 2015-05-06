@@ -22,16 +22,10 @@
         <input type="text" name="ip" id="ip" ng-model="netTools.ip" ng-pattern="/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/">
         <label>Valid IP</label>
       </md-input-container>
-        <md-button class="md-raised md-primary" ng-click="netTools.doSubmit(item, $event)">Go!</md-button>
-          <div>
-            <md-checkbox ng-model="netTools.ping" aria-label="Ping">Ping</md-checkbox>
-          </div>
-          <div>
-            <md-checkbox ng-model="netTools.tracert" aria-label="Tracert">Tracert</md-checkbox>
-          </div>
-          <div>
-            <md-checkbox ng-model="netTools.portscan" aria-label="Port Scan">Port Scan</md-checkbox>
-          </div>
+      <md-button class="md-raised md-primary" ng-click="netTools.doSubmit(item, $event)">Go!</md-button>
+      <md-checkbox ng-model="netTools.ping" aria-label="Ping">Ping</md-checkbox>
+      <md-checkbox ng-model="netTools.tracert" aria-label="Tracert">Traceroute</md-checkbox>
+      <md-checkbox ng-model="netTools.portscan" aria-label="Port Scan">Port Scan</md-checkbox>
     </section>
     <section layout="row" layout-sm="column" layout-align="center center">
       <md-tabs md-dynamic-height md-border-bottom md-no-ink>
@@ -46,30 +40,41 @@
               <input type="number" ng-model="netTools.options.ping.count" aria-label="Count" aria-controls="pingCount-slider">
             </div>
           </div>
-            <div layout>
-              <div flex="20" layout layout-align="center center">
-                <span class="md-body-2">Packet Size:</span>
-              </div>
-              <md-slider flex min="56" max="1492" step="1" ng-model="netTools.options.ping.size" aria-label="Packet Size" id="pingSize-slider" class>
-              </md-slider>
-              <div flex="10" layout layout-align="center center">
-                <input type="number" ng-model="netTools.options.ping.size" aria-label="Packet Size" aria-controls="pingSize-slider">
-              </div>
+          <div layout>
+            <div flex="20" layout layout-align="center center">
+              <span class="md-body-2">Packet Size:</span>
             </div>
-              <div layout>
-                <div flex="20" layout layout-align="center center">
-                  <span class="md-body-2">Timeout(MS):</span>
-                </div>
-                <md-slider flex min="500" max="5000" step="100" ng-model="netTools.options.ping.timeout" aria-label="Timeout(MS)" id="timeout-slider" class>
-                </md-slider>
-                <div flex="10" layout layout-align="center center">
-                  <input type="number" ng-model="netTools.options.ping.timeout" aria-label="Timeout(MS)" aria-controls="timeout-slider">
-                </div>
-              </div>
+            <md-slider flex min="56" max="1492" step="1" ng-model="netTools.options.ping.size" aria-label="Packet Size" id="pingSize-slider" class>
+            </md-slider>
+            <div flex="10" layout layout-align="center center">
+              <input type="number" ng-model="netTools.options.ping.size" aria-label="Packet Size" aria-controls="pingSize-slider">
+            </div>
+          </div>
+          <div layout>
+            <div flex="20" layout layout-align="center center">
+              <span class="md-body-2">Timeout(MS):</span>
+            </div>
+            <md-slider flex min="500" max="5000" step="100" ng-model="netTools.options.ping.timeout" aria-label="Timeout(MS)" id="timeout-slider" class>
+            </md-slider>
+            <div flex="10" layout layout-align="center center">
+              <input type="number" ng-model="netTools.options.ping.timeout" aria-label="Timeout(MS)" aria-controls="timeout-slider">
+            </div>
+          </div>
         </md-tab>
         <md-tab label="traceroute">
         </md-tab>
         <md-tab label="port scan">
+          <md-input-container>
+            <label>Ports</label>
+            <input ng-model="netTools.options.portscan.port">
+          </md-input-container>
+          <div layout>
+            Show:
+            <md-checkbox ng-model="netTools.options.portscan.T" aria-label="Timeout">Timeout</md-checkbox>
+            <md-checkbox ng-model="netTools.options.portscan.R" aria-label="Refused">Refused</md-checkbox>
+            <md-checkbox ng-model="netTools.options.portscan.O" aria-label="Open">Open</md-checkbox>
+            <md-checkbox ng-model="netTools.options.portscan.U" aria-label="Unreachable">Unreachable</md-checkbox>
+          </div>
         </md-tab>
       </md-tabs>
   </section>
@@ -114,7 +119,14 @@
             timeout:2000
           },
           tracert:{},
-          portscan:{}
+          portscan:{
+            T:false,
+            R:false,
+            O:true,
+            U:false,
+            banner: true,
+            port: '21-23,25,37,42,53,69,70,79,80,109,110,115,118,119,137,139,143,150,156,161,179,194,443,1900'
+          }
         }
       };
       $scope.netTools.chunkTimeout = null;
