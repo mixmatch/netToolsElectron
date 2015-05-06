@@ -54,6 +54,8 @@ textarea {
   width: auto; }
 .netController section .md-tabs-content {
   width: auto; }
+.netController .md-tab-content {
+  background-color: #f7f7f7; }
 .netController section .md-button {
   margin-top: 0.1em;
   margin-bottom: 0.1em;
