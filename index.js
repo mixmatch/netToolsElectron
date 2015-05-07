@@ -12,6 +12,8 @@ var os = require('os');
 var evilscan = require('evilscan');
 var request = require('request');
 var cheerio = require('cheerio');
+var nettools = require('./libs/nettools');
+var nT = new nettools({});
 //
 var oneSecond = 1000;
 var oneMinute = 60 * oneSecond;
@@ -172,7 +174,9 @@ expressApp.post('/', function (req, res) {
         //   console.log(JSON.stringify(data[port], null, ' '));
         //   scannerOutput += "Port: " + data[port].port + " | Status: " + data[port].status + " | Banner: " + data[port].banner + "\n"
         // }
-        scannerOutput += "Port: " + data.port + " | Status: " + data.status;
+        scannerOutput += "Port: " + nT.getPortDescription(data.port) + " | Status: " + data.status.replace("close ", "closed ");
+        // console.log(nT.getPortDescription(data.port));
+        // scannerOutput += "Port: " + data.port + " | Status: " + data.status;
         if (data.banner) {
           scannerOutput += " | Banner: \n" + data.banner;
         }
@@ -221,7 +225,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 	mainWindow = new BrowserWindow({
 		width: 800,
-		height: 800,
+		height: 900,
 		resizable: true
 	});
 
