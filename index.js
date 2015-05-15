@@ -8,11 +8,10 @@ var express = require('express');
 var cp = require('child_process');
 var spawn = cp.spawn;
 var exec = cp.exec;
-var os = require('os');
 var evilscan = require('evilscan');
 var request = require('request');
 var cheerio = require('cheerio');
-var nettools = require('./libs/nettools');
+var nettools = require('./lib/nettools');
 var nT = new nettools({});
 //
 var oneSecond = 1000;
@@ -20,49 +19,7 @@ var oneMinute = 60 * oneSecond;
 var oneHour = 60 * oneMinute;
 var oneDay = 24 * oneHour;
 //
-var currPlatform = os.platform();
-var commands = {ping:{}, tracert:{}};
-if (currPlatform === 'linux') {
-    //linux
-    commands.ping = {
-      bin: '/bin/ping',
-      count: '-c',
-      size: '-s',
-      timeout: '-W'
-    };
-    commands.tracert = {
-      bin: '/usr/bin/tracepath'
-    };
-  } else if (currPlatform.match(/^win/)) {
-    //windows
-    commands.ping = {
-      bin: 'C:/windows/system32/ping.exe',
-      count: '-n',
-      size: '-l',
-      timeout: '-w'
-    };
-    commands.tracert = {
-      bin: 'C:/windows/system32/tracert.exe',
-    };
-  } else if (currPlatform === 'darwin') {
-    //mac osx
-    commands.ping = {
-      bin: '/bin/ping',
-      count: '-c',
-      size: '-s',
-      timeout: '-t'
-    };
-    commands.tracert = {
-      bin: '/bin/traceroute'
-    };
-  }
-//
-var defaults = {
-  pingCoung: '100',
-  pingSize: '64',
-  // pingSize: '1472',
-  pingTimeout: '2000'
-}
+
 var requests = {};
 //
 var expressApp = express();
@@ -113,7 +70,7 @@ expressApp.post('/', function (req, res) {
     //init processes
     if (req.body.ping) {
       // res.write('Ping:\n');
-      var ping = spawn(commands.ping.bin, [commands.ping.count, req.body.options.ping.count, commands.ping.size, req.body.options.ping.size, commands.ping.timeout, req.body.options.ping.timeout, ip]);
+      var ping = spawn(nT.platformCommands.ping.bin, [nT.platformCommands.ping.count, req.body.options.ping.count, nT.platformCommands.ping.size, req.body.options.ping.size, nT.platformCommands.ping.timeout, req.body.options.ping.timeout, ip]);
       ping.stdout.on('data', function(data) {
         // console.log('stdout: ' + data);
         currentRequest.result.ping.output += data.toString();
@@ -130,7 +87,7 @@ expressApp.post('/', function (req, res) {
     }
     if (req.body.tracert) {
       // res.write('Ping:\n');
-      var tracert = spawn(commands.tracert.bin, [ip]);
+      var tracert = spawn(nT.platformCommands.tracert.bin, [ip]);
       tracert.stdout.on('data', function(data) {
         currentRequest.result.tracert.output += data.toString();
       });
@@ -174,7 +131,7 @@ expressApp.post('/', function (req, res) {
         //   console.log(JSON.stringify(data[port], null, ' '));
         //   scannerOutput += "Port: " + data[port].port + " | Status: " + data[port].status + " | Banner: " + data[port].banner + "\n"
         // }
-        scannerOutput += "Port: " + nT.getPortDescription(data.port) + " | Status: " + data.status.replace("close ", "closed ");
+        scannerOutput += "Port: " + nT.getPortDescription(data.port) + " | Status: " + data.status.replace("close", "closed");
         // console.log(nT.getPortDescription(data.port));
         // scannerOutput += "Port: " + data.port + " | Status: " + data.status;
         if (data.banner) {
