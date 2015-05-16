@@ -30,9 +30,10 @@ expressApp.use(express.static(__dirname + '/public', { maxAge: oneSecond }));
 expressApp.use(express.static(__dirname + '/bower_components', { maxAge: oneSecond }));
 expressApp.post('/', function (req, res) {
   // console.log(req.body.options);
-  var requestID = Date.now();
-  requests[requestID] = {id: requestID, result: {}};
-  var currentRequest = requests[requestID];
+  var currentRequest = nT.newRequest();
+  // var requestID = Date.now();
+  // requests[requestID] = {id: requestID, result: {}};
+  // var currentRequest = requests[requestID];
   res.setHeader('Content-Type', 'application/json');
   var ip = req.body.ip;
   if (ip){
@@ -157,9 +158,10 @@ expressApp.post('/', function (req, res) {
   }
 });
 expressApp.get('/request', function (req, res) {
-  var currentRequest = requests[req.query.requestID];
+  // var currentRequest = nT.requests[req.query.requestID];
   res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(currentRequest, null, 2));
+  res.end(JSON.stringify(nT.requests[req.query.requestID], null, 2));
+  // res.end(JSON.stringify(currentRequest, null, 2));
 })
 var server = expressApp.listen(3000, function () {
   var host = server.address().address;
