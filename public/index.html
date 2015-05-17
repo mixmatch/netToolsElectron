@@ -140,20 +140,22 @@
         if (dataFromServer.id != "false" && dataFromServer.id != "undefined"){
           for (var tool in dataFromServer.result) {
             // console.log(JSON.stringify(dataFromServer.result[tool], null, 2));
-           $scope.netTools[tool + "Result"] = dataFromServer.result[tool].output;
-           var textarea = document.getElementById(tool + "Result");
-           if (textarea){
-             setTimeout(function(textarea) {
-               textarea.scrollTop = textarea.scrollHeight;
-             }, 1, textarea);
-           }
+            if ($scope.netTools[tool + "Result"] !== dataFromServer.result[tool].output){
+              $scope.netTools[tool + "Result"] = dataFromServer.result[tool].output;
+              var textarea = document.getElementById(tool + "Result");
+              if (textarea){
+                setTimeout(function(textarea) {
+                  textarea.scrollTop = textarea.scrollHeight;
+                }, 1, textarea);
+              }
+            }
            if (dataFromServer.result[tool].complete != true) {
              //console.log(dataFromServer.result[tool].complete);
              if ($scope.netTools.chunkTimeout != null) {
                clearTimeout($scope.netTools.chunkTimeout);
                $scope.netTools.chunkTimeout = null;
              }
-             $scope.netTools.chunkTimeout = setTimeout($scope.netTools.getNextChunk, 100, dataFromServer.id);
+             $scope.netTools.chunkTimeout = setTimeout($scope.netTools.getNextChunk, 301, dataFromServer.id);
            }
           }
         }
