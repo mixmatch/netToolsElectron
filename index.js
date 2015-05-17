@@ -28,7 +28,7 @@ expressApp.use(bodyParser.json());
 expressApp.use(compression());
 expressApp.use(express.static(__dirname + '/public', { maxAge: oneSecond }));
 expressApp.use(express.static(__dirname + '/bower_components', { maxAge: oneSecond }));
-expressApp.post('/', function (req, res) {
+expressApp.post('/nettools/', function (req, res) {
   // console.log(req.body.options);
   var currentRequest = nT.newRequest();
   // var requestID = Date.now();
@@ -157,7 +157,7 @@ expressApp.post('/', function (req, res) {
     res.end(JSON.stringify({id: false}, null, 2));
   }
 });
-expressApp.get('/request', function (req, res) {
+expressApp.get('/nettools/request', function (req, res) {
   // var currentRequest = nT.requests[req.query.requestID];
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(nT.requests[req.query.requestID], null, 2));

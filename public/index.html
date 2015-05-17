@@ -131,7 +131,7 @@
       };
       $scope.netTools.chunkTimeout = null;
       $scope.netTools.getNextChunk = function(requestID) {
-        var responsePromise = $http.get("/request?requestID=" + requestID);
+        var responsePromise = $http.get("/nettools/request?requestID=" + requestID);
         responsePromise.success($scope.netTools.processResponse);
       }
       $scope.netTools.processResponse = function(dataFromServer, status, headers, config) {
@@ -168,7 +168,7 @@
            options: $scope.netTools.options
          };
   
-         var responsePromise = $http.post("/", dataObject, {});
+         var responsePromise = $http.post("/nettools/", dataObject, {});
          responsePromise.success($scope.netTools.processResponse);
           responsePromise.error(function(data, status, headers, config) {
             alert("Submitting form failed!");
